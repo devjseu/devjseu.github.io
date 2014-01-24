@@ -1,0 +1,15 @@
+#wrap > .container {
+    padding-top: 60px;
+}
+
+header > .navbar {
+    background-color: #043554;
+}
+
+header > .navbar-default .navbar-brand {
+    color: #B4B4B4;
+}
+
+h5, .h5 {
+    font-size: 26px;
+}
