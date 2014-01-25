@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"  style="height: 100%">
+<html lang="en" style="height: 100%">
 <head>
     <meta charset="utf-8">
     <title>YAMVC - Yet Another MVC framework for rapid development</title>
@@ -22,14 +22,122 @@
     <script src="js/respond.min.js"></script>
     <![endif]-->
 </head>
-<body  style="height: 100%">
-<div class="jumbotron" style="height: 100%">
-    <h1 style="text-align: center;">
-        UNDER CONSTRUCTION...
+<body style="height: 100%">
+<div class="jumbotron" style="min-height: 100%">
+    <!-- header -->
+    <h1 id="top" style="text-align: center;">
+        YAMVC v0.1.1
     </h1>
-    <p style="text-align: center">
-        <a href="index.html" class="btn btn-primary btn-lg" role="button">Back...</a>
+    <!-- /.header -->
+
+    <!-- lead-text -->
+    <p class="lead" style="text-align: center">
+        Yet Another MVC framework
+    </p>
+    <!-- /.lead-text -->
+
+
+    <!-- navbar -->
+    <nav class="navbar navbar-inverse navbar-embossed" role="navigation">
+        <!-- navbar-collapse -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-01">
+                <span class="sr-only">Toggle navigation</span>
+            </button>
+        </div>
+        <div class="collapse navbar-collapse" id="navbar-collapse-01">
+            <ul class="nav navbar-nav navbar-left">
+                <li><a href="index.html">Homepage</a></li>
+                <li><a href="docs/yamvc/index.html">Docs</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Examples<b class="caret"></b></a>
+                    <span class="dropdown-arrow"></span>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Simple view</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#">Separated link</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </nav>
+    <!-- /.navbar -->
+
+    <h2>Examples</h2>
+
+    <div class="example">
+        <h4 id="example-1">
+            1. Simple view
+        </h4>
+
+        <p>
+            <small>
+
+            </small>
+        </p>
+
+        <div class="example">
+            <div style="width: 50%; float: right;">
+                <p>Result:</p>
+
+                <div class="result">
+                    <pre style="margin: 0; line-height: 125%" id="example-1-result">
+                    </pre>
+                </div>
+            </div>
+            <div style="width: 50%;">
+                <p>Code:</p>
+                <!-- HTML generated using hilite.me -->
+                <div>
+                <pre style="margin: 0; line-height: 125%"><span style="color: #000000; font-weight: bold">(</span><span
+                        style="color: #204a87; font-weight: bold">new</span> <span
+                        style="color: #000000">yamvc</span><span style="color: #000000; font-weight: bold">.</span><span
+                        style="color: #000000">View</span><span style="color: #000000; font-weight: bold">({</span>
+    <span style="color: #000000">config</span><span style="color: #ce5c00; font-weight: bold">:</span> <span
+                            style="color: #000000; font-weight: bold">{</span>
+        <span style="color: #000000">tpl</span><span style="color: #ce5c00; font-weight: bold">:</span> <span
+                            style="color: #204a87; font-weight: bold">new</span> <span
+                            style="color: #000000">yamvc</span><span
+                            style="color: #000000; font-weight: bold">.</span><span
+                            style="color: #000000">view</span><span
+                            style="color: #000000; font-weight: bold">.</span><span
+                            style="color: #000000">Template</span><span
+                            style="color: #000000; font-weight: bold">({</span>
+            <span style="color: #000000">config</span><span style="color: #ce5c00; font-weight: bold">:</span> <span
+                            style="color: #000000; font-weight: bold">{</span>
+                <span style="color: #000000">id</span><span style="color: #ce5c00; font-weight: bold">:</span> <span
+                            style="color: #4e9a06">&#39;tpl-bar&#39;</span><span
+                            style="color: #000000; font-weight: bold">,</span>
+                <span style="color: #000000">tpl</span><span style="color: #ce5c00; font-weight: bold">:</span> <span
+                            style="color: #000000; font-weight: bold">[</span>
+                    <span style="color: #4e9a06">&#39;&lt;span&gt;&#39;</span><span
+                            style="color: #000000; font-weight: bold">,</span>
+                    <span style="color: #4e9a06">&#39;Hello World!&#39;</span><span
+                            style="color: #000000; font-weight: bold">,</span>
+                    <span style="color: #4e9a06">&#39;&lt;/span&gt;&#39;</span>
+                <span style="color: #000000; font-weight: bold">]</span>
+            <span style="color: #000000; font-weight: bold">}</span>
+        <span style="color: #000000; font-weight: bold">}),</span>
+        <span style="color: #000000">renderTo</span><span style="color: #ce5c00; font-weight: bold">:</span> <span
+                            style="color: #4e9a06">&#39;#container&#39;</span>
+    <span style="color: #000000; font-weight: bold">}</span>
+<span style="color: #000000; font-weight: bold">})).</span><span style="color: #000000">render</span><span
+                            style="color: #000000; font-weight: bold">();</span>
+</pre>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <p style="text-align: center; padding-top: 50px;">
+        <a href="#top" class="btn btn-primary btn-lg" role="button">Top</a>
+        <a href="index.html" class="btn btn-primary btn-lg" role="button">Back</a>
     </p>
 </div>
+<script src="js/yamvc/YAMVC.js"></script>
+<script src="js/yamvc/js/examples.js"></script>
 </body>
 </html>
