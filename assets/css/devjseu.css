@@ -13,3 +13,11 @@ header > .navbar-default .navbar-brand {
 h5, .h5 {
     font-size: 26px;
 }
+
+.hljs {
+    background: transparent;
+}
+
+.example-container {
+    overflow: hidden;
+}

@@ -1,4 +1,4 @@
-/*! YAMVC v0.1.11 - 2014-01-25 
+/*! YAMVC v0.1.11 - 2014-01-27 
  *  License:  */
 (function (window, undefined) {
     "use strict";
@@ -930,17 +930,21 @@
         init: function (opts) {
             var config,
                 me = this;
+
             opts = opts || {};
             config = opts.config || {};
             router = router || new yamvc.Router();
+
             me.set('initOpts', opts);
             me.set('config', config);
             me.set('routes', config.routes || {});
             me.set('events', config.events || {});
             me.set('views', config.views || {});
+
             me.initConfig();
             me.renderViews();
             me.restoreRouter();
+
             return me;
         },
         initConfig: function () {
@@ -952,6 +956,7 @@
                 query,
                 rx = /(^\$|,$)/,
                 view;
+
             if (routes) {
                 for (var k in routes) {
                     if (routes.hasOwnProperty(k)) {
@@ -960,6 +965,7 @@
                     }
                 }
             }
+
             if (events && views) {
                 for (view in views) {
                     if (views.hasOwnProperty(view)) {
@@ -968,33 +974,51 @@
                 }
 
                 for (query in events) {
+
                     if (events.hasOwnProperty(query)) {
+
                         if (rx.test(query)) {
+
                             view = views[query.substr(1)];
+
                             if (view) {
+
                                 for (var event in events[query]) {
+
                                     if (events[query].hasOwnProperty(event)) {
                                         view.addListener(event, events[query][event].bind(me, view));
                                     }
+
                                 }
+
                             }
+
                             delete events[query];
                         }
                     }
+
                 }
+
             }
             return this;
         },
         renderViews: function () {
             var me = this,
                 views = me.get('views');
+
             for (var view in views) {
+
                 if (views.hasOwnProperty(view)) {
+
                     if (views[view].getAutoCreate && views[view].getAutoCreate()) {
+
                         views[view].render();
+
                     }
                 }
+
             }
+
         },
         resolveEvents: function (view) {
             var events = this.get('events'),
@@ -1002,31 +1026,50 @@
                 newScope = function (func, scope, arg) {
                     return func.bind(scope, arg);
                 },
+                elements,
                 scope;
+
             for (var query in events) {
+
                 if (events.hasOwnProperty(query)) {
+
                     viewEvents = events[query];
-                    var elements = view.get('el').querySelectorAll(query);
+                    elements = view.get('el').querySelectorAll(query);
                     for (var i = 0, l = elements.length; i < l; i++) {
+
                         for (var event in viewEvents) {
+
                             if (viewEvents.hasOwnProperty(event)) {
+
                                 scope = newScope(viewEvents[event], this, view);
+
                                 elements[i].addEventListener(event, scope);
+
                             }
+
                         }
+
                     }
+
                 }
+
             }
+
         },
         getRouter: function () {
             return router;
         },
         restoreRouter: function () {
             var me = this;
+
             me.getRouter().restore();
+
             return me;
-        }, redirectTo: function (path) {
+        },
+        redirectTo: function (path) {
+
             window.location.hash = path;
+
             return this;
         }
     });
@@ -2341,56 +2384,9 @@
  * Views are easily expendable, so you can fell free to add more awesome functionality to it.
  *
  *     @example
- *     window.OverlayView = View.$extend(function OverlayView(opts) {
- *         View.prototype.constructor.call(this, opts);
- *     });
- *     OverlayView.prototype.show = function (callback) {
- *         var me = this,
- *             dom = me.get('el'),
- *         config = me.get('config');
- *         if (me.get('isAnimated')) {
- *             jQuery(dom).stop();
- *         }
- *         me.set('isAnimated', true);
- *         jQuery(dom).css({
- *             display: 'block',
- *             opacity: 0
- *         }).animate({
- *             opacity: 1
- *         }, config.showDuration || 500, function () {
- *             me.set('isAnimated', false);
- *             if (callback)
- *                 callback(me, this);
- *             });
- *     };
+ *     window.OverlayView = View.$extend({
  *
- *     OverlayView.prototype.hide = function (callback) {
- *             var me = this,
- *                 dom = me.get('el'),
- *                 config = me.get('config');
- *             if (me.get('isAnimated')) {
- *                 jQuery(dom).stop();
- *             }
- *             me.set('isAnimated', true);
- *             jQuery(dom).animate({
- *                 opacity: 0
- *             }, config.hideDuration || 500, function () {
- *                 jQuery(dom).css({
- *                     display: 'none'
- *                 });
- *                 me.set('isAnimated', false);
- *                 if (callback)
- *                     callback(me, this);
- *             });
- *     };
- *     var overlay = new OverlayView({
- *       config: {
- *          tpl: 'container',
- *          renderTo: '#body',
- *          models: window.models
  *     });
- *     overlay.render();
- *     overlay.show();
  *
  *
  */
@@ -2398,6 +2394,7 @@
     "use strict";
 
     var yamvc = window.yamvc || {},
+        style = document.createElement('style'),
         VM,
         VTM,
         View,
@@ -2413,6 +2410,9 @@
 
     fillAttrs = makeMap("checked,compact,declare,defer,disabled,ismap,multiple,nohref,noresize,noshade,nowrap,readonly,selected");
 
+    style.innerHTML = ".yamvc {display:inline;}";
+
+    document.body.appendChild(style);
 
     // Object that stores all views
     /**
@@ -2460,6 +2460,9 @@
      * @type {function}
      */
     View = yamvc.Core.$extend({
+        defaults: {
+            parent: null
+        },
         // Initializing function in which we call parent method, merge previous
         // configuration with new one, set id of component, initialize config
         // and save reference to component in View Manager.
@@ -2469,25 +2472,34 @@
          * @returns {View}
          */
         init: function (opts) {
+
             yamvc.Core.prototype.init.apply(this);
+
             var me = this, config, id;
+
             opts = opts || {};
             config = yamvc.$merge(me._config, opts.config);
             config.id = id = config.id || 'view-' + VM.i;
-            config.views = config.views || {};
+            config.children = config.children || [];
+
             me.set('initOpts', opts);
             me.set('config', config);
+
             me.initConfig();
             VM.add(id, me);
+
             return me;
         },
         /**
          * @returns {View}
          */
         initConfig: function () {
+
             yamvc.Core.prototype.initConfig.apply(this);
+
             this.initTemplate();
             this.initModels();
+
             return this;
         },
         /**
@@ -2526,6 +2538,7 @@
             }
 
             me.set('tpl', div);
+
             return me;
         },
         /**
@@ -2545,6 +2558,7 @@
                     me.setModel(model, models[model]);
                 }
             }
+
             return me;
         },
         /**
@@ -2553,8 +2567,11 @@
         setModel: function (namespace, model) {
             var me = this,
                 models = me.getModels();
+
             models[model.getNamespace()] = model;
+
             me.setModels(models);
+
             return me;
         },
         /**
@@ -2568,8 +2585,8 @@
                 l;
 
             l = models.length;
-            while(l--){
-                if(models[l].getNamespace() === namespace){
+            while (l--) {
+                if (models[l].getNamespace() === namespace) {
                     model = models[l];
                     break;
                 }
@@ -2723,7 +2740,6 @@
                                 result = results[i++];
                                 header = result.substr(2, (result.length - 4)).split('.');
 
-
                                 if (!fillAttr) {
 
                                     if (me.getModel(header[0])) {
@@ -2742,13 +2758,17 @@
 
                             }
 
-                            if (fillAttr && !ret) {
+                            if (fillAttr) {
 
-                                node.removeAttribute(attr.nodeName);
+                                if (!ret) {
 
-                            } else {
+                                    node.removeAttribute(attr.nodeName);
 
-                                node.setAttribute(attr.nodeName, ret);
+                                } else {
+
+                                    node.setAttribute(attr.nodeName, ret);
+
+                                }
 
                             }
 
@@ -2778,9 +2798,13 @@
                 j++;
             }
 
-            el = parsedTpl.childNodes.item(j);
+            if (j > 1)
+                el = parsedTpl.childNodes.item(j);
+            else
+                el = parsedTpl;
 
             el.setAttribute('yamvc-id', config.id);
+            el.setAttribute('class', 'yamvc');
 
             me.set('el', el);
             me.set('bindings', bindings);
@@ -2788,11 +2812,17 @@
             me.resolveBindings();
 
             if (parent) {
+
                 parent.appendChild(el);
 
                 if (parentView) {
-                    parentView.views = parentView.views || {};
-                    parentView.views[config.id] = me;
+
+                    if (parentView.findChild(me.getId()) < 0) {
+
+                        parentView.getChildren().push(me);
+
+                    }
+
                 }
 
                 me.set('isInDOM', true);
@@ -2856,7 +2886,7 @@
         partialRender: function (binding) {
             var me = this,
                 element = binding.type === 3,
-                org = element ? binding.original : true,
+                org = element ? binding.original : (binding.fillAttr ? true : binding.original),
                 headers = binding.headers,
                 len = headers.length,
                 header;
@@ -2912,17 +2942,6 @@
             return this.get('el').querySelectorAll(selector);
         },
         /**
-         * @param id
-         * @returns {View||Boolean}
-         */
-        getChild: function (id) {
-            var me = this,
-                config = me.get('config');
-            if (!config.views || config.views && !config.views[id])
-                return false;
-            return config.views[id];
-        },
-        /**
          * @param view
          * @param selector
          * @returns {View}
@@ -2934,24 +2953,77 @@
             return me;
         },
         /**
-         * @returns {View}
+         * @param id
+         * @returns {View||Boolean}
+         */
+        getChild: function (id) {
+            var me = this;
+
+            if (me.findChild(id) < 0)
+                return false;
+
+            return me.findChild(id);
+        },
+        findChild: function (id) {
+            var views = this.getChildren(),
+                l = views.length;
+
+            while (l--) {
+                if (views[l].getId() === id)
+                    break;
+            }
+
+            return l;
+        },
+        removeChild: function (id) {
+            var views = this.getChildren(),
+                l = views.length,
+                view;
+
+            while (l--) {
+                if (views[l].getId() === id) {
+
+                    view = views[l].clear();
+
+                }
+            }
+
+            return view || null;
+        },
+        /**
+         * @returns {Array}
          */
         removeChildren: function () {
-            var views = this.get('config').views || [];
-            for (var i = 0, len = views.length; i < len; i++) {
-                views[i].clear();
+            var views = this.getChildren(),
+                l = views.length,
+                removed = [];
+
+            while (l--) {
+                removed.push(views[l].clear());
             }
-            return this;
+
+
+            return removed;
         },
         /**
          * @returns {View}
          */
         clear: function () {
-            var me = this, el = me.get('el');
+            var me = this,
+                el = me.get('el'),
+                parent = me.getParent();
+
             if (me.isInDOM()) {
                 el.parentNode.removeChild(el);
                 me.set('isInDOM', false);
             }
+
+            if (parent) {
+
+                //todo: here
+
+            }
+
             return me;
         },
         /**
@@ -2968,32 +3040,56 @@
         appendTo: function (parent, selector) {
             var me = this,
                 config = me.get('config'),
-                id = config.id,
-                views = parent.get('config').views,
+                id = me.getId(),
+                views = parent.getChildren(),
+                oldParent = config.parent,
                 parentEl = selector ? parent.get('el').querySelector(selector) : parent.get('el');
 
             if (selector) {
+
                 config.renderTo = selector;
+
             }
 
-            if (!config.parent) {
+            if (!oldParent) {
+
                 config.parent = parent;
+
             }
-            else if (config.parent && config.parent.get('config').id !== parent.get('config').id) {
-                delete config.parent.get('config').views[id];
+            else if (oldParent && oldParent.getId() !== parent.getId()) {
+
+                if (oldParent.findChild(id) > -1) {
+
+                    oldParent
+                        .getChildren()
+                        .splice(
+                            oldParent.findChild(id), 1
+                        );
+
+                }
+
             }
 
             if (!me.isInDOM() && parent.isInDOM()) {
+
                 if (!me.get('el')) {
+
                     me.render();
+
                 } else {
+
                     parentEl.appendChild(me.get('el'));
                     me.set('isInDOM', true);
                     me.reAppendChildren();
                     me.fireEvent('render', null, me);
+
                 }
+
             }
-            views[id] = me;
+
+
+            views.push(me);
+
             config.parent = parent;
             return me;
         },
@@ -3001,12 +3097,13 @@
          * @returns {View}
          */
         reAppendChildren: function () {
-            var views = this.get('config').views;
-            for (var key in views) {
-                if (views.hasOwnProperty(key)) {
-                    views[key].appendTo(this);
-                }
+            var views = this.getChildren(),
+                l = views.length;
+
+            while (l--) {
+                views[l].appendTo(this);
             }
+
             return this;
         },
         /**
@@ -3015,12 +3112,16 @@
         show: function () {
             var me = this,
                 style;
+
             if (!me.isInDOM())
                 return me;
+
             style = me.get('el').style;
             style.display = 'block';
+
             me.set('visible', true);
             me.fireEvent('show', me, style);
+
             return me;
         },
         /**
@@ -3029,12 +3130,16 @@
         hide: function () {
             var me = this,
                 style;
+
             if (!me.isInDOM())
                 return me;
+
             style = me.get('el').style;
             style.display = 'none';
+
             me.set('visible', false);
             me.fireEvent('hide', me, style);
+
             return me;
         },
         /**

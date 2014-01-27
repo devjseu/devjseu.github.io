@@ -12,6 +12,7 @@
     <link href="assets/css/flat-ui.css" rel="stylesheet">
 
     <!-- Homepage -->
+    <link rel="stylesheet" href="http://yandex.st/highlightjs/8.0/styles/default.min.css">
     <link href="assets/css/devjseu.css" rel="stylesheet">
 
     <link rel="shortcut icon" href="assets/images/favicon.ico">
@@ -66,9 +67,194 @@
 
     <h2>Examples</h2>
 
-    <div class="example">
+    <div class="example-container">
         <h4 id="example-1">
             1. Simple view
+        </h4>
+
+        <p>
+            <small>
+
+            </small>
+        </p>
+
+        <div class="example">
+            <div class="col-md-6">
+                <p>Javascript:</p>
+                <!-- HTML generated using hilite.me -->
+                <div>
+                    <pre><code class="javascript">(new yamvc.View({
+    config: {
+        tpl: new yamvc.view.Template({
+            config: {
+                id: 'tpl-example-1',
+                tpl: [
+                    'Hello World!'
+                ]
+            }
+        }),
+        renderTo: '#example-1-result'
+    }
+})).render();</code></pre>
+                </div>
+
+            </div>
+            <div class="col-md-6">
+                <p>Result:</p>
+
+                <div class="result">
+                    <pre style="margin: 0; line-height: 125%" id="example-1-result"></pre>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="example-container">
+        <h4 id="example-2">
+            2. View <-> Model binding
+        </h4>
+
+        <p>
+            <small>
+
+            </small>
+        </p>
+
+        <div class="example">
+            <div class="col-md-6">
+                <p>Javascript:</p>
+                <!-- HTML generated using hilite.me -->
+                <div>
+                    <pre><code class="javascript">var view, model;
+
+model = new yamvc.Model({
+    config: {
+        namespace: 'example',
+        data: {
+            name: "Guest"
+        }
+    }
+});
+
+view = new yamvc.View({
+    config: {
+        models : [
+            model
+        ],
+        tpl: new yamvc.view.Template({
+            config: {
+                id: 'tpl-example-2',
+                tpl: [
+                    'Hi {{example.name}}!'
+                ]
+            }
+        }),
+        renderTo: '#example-2-result'
+    }
+});
+
+view.render();</code></pre>
+                </div>
+
+            </div>
+            <div class="col-md-6">
+                <p>Result:</p>
+
+                <div class="result">
+                    <pre style="margin: 0; line-height: 125%" id="example-2-result"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="example-container">
+        <h4 id="example-3">
+            3. Event control in Controller
+        </h4>
+
+        <p>
+            <small>
+
+            </small>
+        </p>
+
+        <div class="example">
+            <div class="col-md-6">
+                <p>Javascript:</p>
+                <!-- HTML generated using hilite.me -->
+                <div>
+                    <pre><code class="javascript">var view, model, controller;
+
+model = new yamvc.Model({
+    config: {
+        namespace: 'example',
+        data: {
+            name: "",
+            display: "none"
+        }
+    }
+});
+
+view = new yamvc.View({
+    config: {
+        models: [
+            model
+        ],
+        tpl: new yamvc.view.Template({
+            config: {
+                id: 'tpl-example-3',
+                tpl: [
+                    '&lt;div>Who are you ?&lt;/div>',
+                    '&lt;button style="margin: 10px;">answer&lt;/button>',
+                    '&lt;div style="display: {{example.display}}">Hi {{example.name}}&lt;/div>'
+                ]
+            }
+        }),
+        renderTo: '#example-3-result'
+    }
+});
+
+controller = new yamvc.Controller({
+    config: {
+        name: 'Main',
+        views: {
+            example: view
+        },
+        events: {
+            'button': {
+                click: function (view, e) {
+                    var name = prompt("What is your name?");
+
+                    view.getModel('example').data("name", name);
+
+                    if(name.length)
+                        view.getModel('example').data("display", "block");
+                    else
+                        view.getModel('example').data("display", "none");
+
+                }
+            }
+        }
+    }
+});</code></pre>
+                </div>
+
+            </div>
+            <div class="col-md-6">
+                <p>Result:</p>
+
+                <div class="result">
+                    <pre style="margin: 0; line-height: 125%" id="example-3-result"></pre>
+                </div>
+            </div>
+
+        </div>
+    </div>
+<!--
+    <div class="example-container">
+        <h4 id="example-4">
+            2. View <-> Model binding
         </h4>
 
         <p>
@@ -82,49 +268,13 @@
                 <p>Result:</p>
 
                 <div class="result">
-                    <pre style="margin: 0; line-height: 125%" id="example-1-result">
-                    </pre>
+                    <pre style="margin: 0; line-height: 125%" id="example-4-result"></pre>
                 </div>
             </div>
             <div style="width: 50%;">
-                <p>Code:</p>
-                <!-- HTML generated using hilite.me -->
+                <p>Javascript:</p>
                 <div>
-                <pre style="margin: 0; line-height: 125%"><span style="color: #000000; font-weight: bold">(</span><span
-                        style="color: #204a87; font-weight: bold">new</span> <span
-                        style="color: #000000">yamvc</span><span style="color: #000000; font-weight: bold">.</span><span
-                        style="color: #000000">View</span><span style="color: #000000; font-weight: bold">({</span>
-    <span style="color: #000000">config</span><span style="color: #ce5c00; font-weight: bold">:</span> <span
-                            style="color: #000000; font-weight: bold">{</span>
-        <span style="color: #000000">tpl</span><span style="color: #ce5c00; font-weight: bold">:</span> <span
-                            style="color: #204a87; font-weight: bold">new</span> <span
-                            style="color: #000000">yamvc</span><span
-                            style="color: #000000; font-weight: bold">.</span><span
-                            style="color: #000000">view</span><span
-                            style="color: #000000; font-weight: bold">.</span><span
-                            style="color: #000000">Template</span><span
-                            style="color: #000000; font-weight: bold">({</span>
-            <span style="color: #000000">config</span><span style="color: #ce5c00; font-weight: bold">:</span> <span
-                            style="color: #000000; font-weight: bold">{</span>
-                <span style="color: #000000">id</span><span style="color: #ce5c00; font-weight: bold">:</span> <span
-                            style="color: #4e9a06">&#39;tpl-bar&#39;</span><span
-                            style="color: #000000; font-weight: bold">,</span>
-                <span style="color: #000000">tpl</span><span style="color: #ce5c00; font-weight: bold">:</span> <span
-                            style="color: #000000; font-weight: bold">[</span>
-                    <span style="color: #4e9a06">&#39;&lt;span&gt;&#39;</span><span
-                            style="color: #000000; font-weight: bold">,</span>
-                    <span style="color: #4e9a06">&#39;Hello World!&#39;</span><span
-                            style="color: #000000; font-weight: bold">,</span>
-                    <span style="color: #4e9a06">&#39;&lt;/span&gt;&#39;</span>
-                <span style="color: #000000; font-weight: bold">]</span>
-            <span style="color: #000000; font-weight: bold">}</span>
-        <span style="color: #000000; font-weight: bold">}),</span>
-        <span style="color: #000000">renderTo</span><span style="color: #ce5c00; font-weight: bold">:</span> <span
-                            style="color: #4e9a06">&#39;#container&#39;</span>
-    <span style="color: #000000; font-weight: bold">}</span>
-<span style="color: #000000; font-weight: bold">})).</span><span style="color: #000000">render</span><span
-                            style="color: #000000; font-weight: bold">();</span>
-</pre>
+                    <pre><code class="javascript"></code></pre>
                 </div>
 
             </div>
@@ -132,12 +282,44 @@
         </div>
     </div>
 
+    <div class="example-container">
+        <h4 id="example-5">
+            2. View <-> Model binding
+        </h4>
+
+        <p>
+            <small>
+
+            </small>
+        </p>
+
+        <div class="example">
+            <div style="width: 50%; float: right;">
+                <p>Result:</p>
+
+                <div class="result">
+                    <pre style="margin: 0; line-height: 125%" id="example-5-result"></pre>
+                </div>
+            </div>
+            <div style="width: 50%;">
+                <p>Javascript:</p>
+                <div>
+                    <pre><code class="javascript"></code></pre>
+                </div>
+
+            </div>
+
+        </div>
+    </div>-->
+
     <p style="text-align: center; padding-top: 50px;">
         <a href="#top" class="btn btn-primary btn-lg" role="button">Top</a>
         <a href="index.html" class="btn btn-primary btn-lg" role="button">Back</a>
     </p>
 </div>
-<script src="js/yamvc/YAMVC.js"></script>
+<script src="js/yamvc/YAMVC.min.js"></script>
 <script src="js/yamvc/js/examples.js"></script>
+<script src="http://yandex.st/highlightjs/8.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
 </body>
 </html>
