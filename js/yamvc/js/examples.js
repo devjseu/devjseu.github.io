@@ -69,8 +69,8 @@ yamvc.$onReady(function () {
                     id: 'tpl-example-3',
                     tpl: [
                         '<div>Who are you ?</div>',
-                        '<button style="margin: 10px;">answer</button>',
-                        '<div style="display: {{example.display}}">Hi {{example.name}}</div>'
+                        '<button css="margin: 10px;">answer</button>',
+                        '<div css="display: {{example.display}}">Hi {{example.name}}</div>'
                     ]
                 }
             }),
