@@ -87,11 +87,11 @@ yamvc.$onReady(function () {
             events: {
                 'button': {
                     click: function (view, e) {
-                        var name = prompt("What is your name?");
+                        var name = prompt("What is your name?", "");
 
                         view.getModel('example').data("name", name);
 
-                        if(name.length)
+                        if(name)
                             view.getModel('example').data("display", "block");
                         else
                             view.getModel('example').data("display", "none");

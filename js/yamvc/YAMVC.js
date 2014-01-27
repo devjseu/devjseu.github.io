@@ -2770,6 +2770,22 @@
 
                                 }
 
+                            } else {
+
+                                if (attr.nodeName === 'css') {
+
+                                    var value = attr.nodeValue;
+
+                                    attr = document.createAttribute("style");
+
+                                    attr.nodeValue = value;
+
+                                    node.removeAttribute('css');
+
+                                    attrs.setNamedItem(attr);
+
+                                }
+
                             }
 
                             bindings.push({
@@ -2803,7 +2819,7 @@
             else
                 el = parsedTpl;
 
-            el.setAttribute('yamvc-id', config.id);
+            el.setAttribute('id', config.id);
             el.setAttribute('class', 'yamvc');
 
             me.set('el', el);
@@ -2880,7 +2896,7 @@
             }
         },
         /**
-         * @version 0.1.8
+         * @version 0.1.11
          * @param binding
          */
         partialRender: function (binding) {
@@ -2978,17 +2994,18 @@
         removeChild: function (id) {
             var views = this.getChildren(),
                 l = views.length,
-                view;
+                view = [];
 
             while (l--) {
                 if (views[l].getId() === id) {
 
-                    view = views[l].clear();
+                    view = views.splice(l, 1);
+                    view[0].clear();
 
                 }
             }
 
-            return view || null;
+            return view[0] || null;
         },
         /**
          * @returns {Array}
@@ -3010,18 +3027,11 @@
          */
         clear: function () {
             var me = this,
-                el = me.get('el'),
-                parent = me.getParent();
+                el = me.get('el');
 
             if (me.isInDOM()) {
                 el.parentNode.removeChild(el);
                 me.set('isInDOM', false);
-            }
-
-            if (parent) {
-
-                //todo: here
-
             }
 
             return me;

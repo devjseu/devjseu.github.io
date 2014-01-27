@@ -1,5 +1,5 @@
 #wrap > .container {
-    padding-top: 60px;
+    padding-top: 170px;
 }
 
 header > .navbar {
@@ -20,4 +20,10 @@ h5, .h5 {
 
 .example-container {
     overflow: hidden;
+}
+
+@media (min-width: 768px) {
+    #wrap > .container {
+        padding-top: 60px;
+    }
 }
