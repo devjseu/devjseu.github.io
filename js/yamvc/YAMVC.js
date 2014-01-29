@@ -2607,12 +2607,11 @@
                 parentView = config.parent,
                 bindings = [],
                 headers = [],
-//                bindRegEx = /({{.+?}})/gi,
                 results,
                 result,
                 header,
                 ret,
-//                replaceFn,
+                value,
                 parsedTpl,
                 walker,
                 node,
@@ -2623,22 +2622,6 @@
                 len = 0,
                 attrs = [],
                 attr;
-
-            /*replaceFn = function (match, type, pointer) {
-             var header = match.substr(2, (match.length - 4)).split('.'),
-             ret;
-             if (models[header[0]]) {
-             ret = models[header[0]].data(header[1]) || "";
-             } else {
-             ret = "";
-             }
-             bindings.push({
-             header: header,
-             type: type,
-             pointer: pointer
-             });
-             return ret;  // and replace it with value from model.
-             };*/
 
             if (parent) {// If parent is set,
                 if (id && parent.queryEl(id)) { // search for element to which we will append component.
@@ -2774,7 +2757,7 @@
 
                                 if (attr.nodeName === 'css') {
 
-                                    var value = attr.nodeValue;
+                                    value = attr.nodeValue;
 
                                     attr = document.createAttribute("style");
 
@@ -2796,6 +2779,22 @@
                                 attrName: attr.nodeName,
                                 pointer: node
                             });
+
+                        } else {
+
+                            if (attr.nodeName === 'css') {
+
+                                value = attr.nodeValue;
+
+                                attr = document.createAttribute("style");
+
+                                attr.nodeValue = value;
+
+                                node.removeAttribute('css');
+
+                                attrs.setNamedItem(attr);
+
+                            }
 
                         }
 
