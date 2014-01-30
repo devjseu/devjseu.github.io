@@ -1,4 +1,4 @@
-/*! YAMVC v0.1.11 - 2014-01-27 
+/*! YAMVC v0.1.12 - 2014-01-30 
  *  License:  */
 (function (window, undefined) {
     "use strict";
@@ -74,12 +74,13 @@
 
         /**
          * fire event
+         * @version 0.1.12
          * @param evName
          * @param callback
          * @returns {this}
          *
          */
-        addListener: function (evName, callback) {
+        addEventListener: function (evName, callback) {
             var listeners = this._listeners[evName] || [];
             listeners.push(callback);
             this._listeners[evName] = listeners;
@@ -88,13 +89,14 @@
 
         /**
          * fire event
+         * @version 0.1.12
          * @param evName
          * @param callback
          * @returns {this}
          *
          */
-        removeListener: function (evName, callback) {
-            var listeners = this._listeners,
+        removeEventListener: function (evName, callback) {
+            var listeners = this._listeners[evName] || [],
                 index;
             if (listeners) {
                 if (callback) {
@@ -109,7 +111,7 @@
                     }
                     listeners.splice(index, 1);
                 } else {
-                    this._listeners = [];
+                    this._listeners[evName] = [];
                 }
             }
             return this;
@@ -252,7 +254,7 @@
          * @returns {this}
          */
         Core.prototype.onChange = function (property, callback) {
-            this.addListener(property + 'Change', callback);
+            this.addEventListener(property + 'Change', callback);
             return this;
         };
 
@@ -969,7 +971,7 @@
             if (events && views) {
                 for (view in views) {
                     if (views.hasOwnProperty(view)) {
-                        views[view].addListener('render', me.resolveEvents.bind(me));
+                        views[view].addEventListener('render', me.resolveEvents.bind(me));
                     }
                 }
 
@@ -986,7 +988,7 @@
                                 for (var event in events[query]) {
 
                                     if (events[query].hasOwnProperty(event)) {
-                                        view.addListener(event, events[query][event].bind(me, view));
+                                        view.addEventListener(event, events[query][event].bind(me, view));
                                     }
 
                                 }
@@ -2071,6 +2073,172 @@
     window.yamvc.Model = Model;
 }(window));
 
+/*
+ * classList.js: Cross-browser full element.classList implementation.
+ * 2014-01-07
+ *
+ * By Eli Grey, http://eligrey.com
+ * Public Domain.
+ * NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
+ */
+
+/*global self, document, DOMException */
+
+/*! @source http://purl.eligrey.com/github/classList.js/blob/master/classList.js*/
+
+if ("document" in self && !("classList" in document.createElement("_"))) {
+
+    (function (view) {
+
+        "use strict";
+
+        if (!('Element' in view)) return;
+
+        var
+            classListProp = "classList",
+            protoProp = "prototype",
+            elemCtrProto = view.Element[protoProp],
+            objCtr = Object,
+            strTrim = String[protoProp].trim || function () {
+                return this.replace(/^\s+|\s+$/g, "");
+            },
+            arrIndexOf = Array[protoProp].indexOf || function (item) {
+                var
+                    i = 0,
+                    len = this.length;
+
+                for (; i < len; i++) {
+                    if (i in this && this[i] === item) {
+                        return i;
+                    }
+                }
+                return -1;
+            },
+        // Vendors: please allow content code to instantiate DOMExceptions
+
+            DOMEx = function (type, message) {
+                this.name = type;
+                this.code = DOMException[type];
+                this.message = message;
+            },
+            checkTokenAndGetIndex = function (classList, token) {
+                if (token === "") {
+                    throw new DOMEx(
+                        "SYNTAX_ERR",
+                        "An invalid or illegal string was specified"
+                    );
+                }
+                if (/\s/.test(token)) {
+                    throw new DOMEx(
+                        "INVALID_CHARACTER_ERR",
+                        "String contains an invalid character"
+                    );
+                }
+                return arrIndexOf.call(classList, token);
+            },
+            ClassList = function (elem) {
+                var
+                    trimmedClasses = strTrim.call(elem.getAttribute("class") || ""),
+                    classes = trimmedClasses ? trimmedClasses.split(/\s+/) : [],
+                    i = 0,
+                    len = classes.length;
+
+                for (; i < len; i++) {
+                    this.push(classes[i]);
+                }
+
+                this._updateClassName = function () {
+                    elem.setAttribute("class", this.toString());
+                };
+            },
+            classListProto = ClassList[protoProp] = [],
+            classListGetter = function () {
+                return new ClassList(this);
+            };
+// Most DOMException implementations don't allow calling DOMException's toString()
+// on non-DOMExceptions. Error's toString() is sufficient here.
+        DOMEx[protoProp] = Error[protoProp];
+        classListProto.item = function (i) {
+            return this[i] || null;
+        };
+        classListProto.contains = function (token) {
+            token += "";
+            return checkTokenAndGetIndex(this, token) !== -1;
+        };
+        classListProto.add = function () {
+            var
+                tokens = arguments, i = 0, l = tokens.length, token, updated = false;
+            do {
+                token = tokens[i] + "";
+                if (checkTokenAndGetIndex(this, token) === -1) {
+                    this.push(token);
+                    updated = true;
+                }
+            }
+            while (++i < l);
+
+            if (updated) {
+                this._updateClassName();
+            }
+        };
+        classListProto.remove = function () {
+            var
+                tokens = arguments, i = 0, l = tokens.length, token, updated = false;
+
+            do {
+                token = tokens[i] + "";
+                var index = checkTokenAndGetIndex(this, token);
+                if (index !== -1) {
+                    this.splice(index, 1);
+                    updated = true;
+                }
+            }
+            while (++i < l);
+
+            if (updated) {
+                this._updateClassName();
+            }
+        };
+        classListProto.toggle = function (token, forse) {
+            token += "";
+
+            var
+                result = this.contains(token),
+                method = result ?
+                    forse !== true && "remove"
+                    :
+                    forse !== false && "add"
+                ;
+
+            if (method) {
+                this[method](token);
+            }
+
+            return !result;
+        };
+        classListProto.toString = function () {
+            return this.join(" ");
+        };
+
+        if (objCtr.defineProperty) {
+            var classListPropDesc = {
+                get: classListGetter, enumerable: true, configurable: true
+            };
+            try {
+                objCtr.defineProperty(elemCtrProto, classListProp, classListPropDesc);
+            } catch (ex) { // IE 8 doesn't support enumerable:true
+                if (ex.number === -0x7FF5EC54) {
+                    classListPropDesc.enumerable = false;
+                    objCtr.defineProperty(elemCtrProto, classListProp, classListPropDesc);
+                }
+            }
+        } else if (objCtr[protoProp].__defineGetter__) {
+            elemCtrProto.__defineGetter__(classListProp, classListGetter);
+        }
+
+    }(self));
+
+}
 /**
  * @author rhysbrettbowen
  * @contributed mkalafior
@@ -2410,7 +2578,7 @@
 
     fillAttrs = makeMap("checked,compact,declare,defer,disabled,ismap,multiple,nohref,noresize,noshade,nowrap,readonly,selected");
 
-    style.innerHTML = ".yamvc {display:inline;}";
+    style.innerHTML = ".yamvc {display:inline;}; .yamvc-hidden {display: none;}";
 
     document.body.appendChild(style);
 
@@ -2545,19 +2713,7 @@
          * @returns {View}
          */
         initModels: function () {
-            var me = this,
-                models,
-                model;
-            if (!me.getModels) {
-                return me;
-            }
-
-            models = me.getModels();
-            for (model in models) {
-                if (models.hasOwnProperty(model)) {
-                    me.setModel(model, models[model]);
-                }
-            }
+            var me = this;
 
             return me;
         },
@@ -2568,9 +2724,9 @@
             var me = this,
                 models = me.getModels();
 
-            models[model.getNamespace()] = model;
-
+            models.push(model);
             me.setModels(models);
+            me.resolveModelBindings(model);
 
             return me;
         },
@@ -2581,7 +2737,7 @@
         getModel: function (namespace) {
             var me = this,
                 models = me.getModels(),
-                model,
+                model = null,
                 l;
 
             l = models.length;
@@ -2596,6 +2752,7 @@
         },
         /**
          * @version 0.1.11
+         * @param {Boolean} force
          * @returns {Node}
          */
         render: function () {
@@ -2623,16 +2780,26 @@
                 attrs = [],
                 attr;
 
+            if (me.isInDOM()) {
+
+                    me.removeRendered();
+
+            }
+
             if (parent) {// If parent is set,
+
                 if (id && parent.queryEl(id)) { // search for element to which we will append component.
                     parent = parent.queryEl(id);
                 } else {// If not found, append to parent root element.
                     parent = parent._el;
                 }
+
             } else {// If parent not set,
+
                 if (id) { // but we have an id of element to which we want render new one,
                     parent = document.querySelector(id);// we search for it in the whole document.
                 }
+
             }
 
             parsedTpl = tpl.cloneNode(true); // Next, clone template.
@@ -2650,7 +2817,7 @@
                 if (node.nodeType === 3) { // If our element is text node
                     results = node.data.match(/\{\{(.*?)\}\}/gi);// we searching for mustached text inside it
                     if (results) { // and if we have positive match
-                        var text = node.nodeValue,
+                        var text = node.value || node.data,
                             doc = document.createElement('span'),// we create new span element
                             rId = "v-r-b-" + renderId++;
 
@@ -2686,7 +2853,7 @@
 
                         // We also keep founded bindings.
                         bindings.push({
-                            original: node.nodeValue,
+                            original: node.value || node.data,
                             headers: headers,
                             type: 3,
                             pointer: doc,
@@ -2694,7 +2861,7 @@
                         });
 
                     }
-                    /*node.nodeValue = node.nodeValue.replace(bindRegEx, function (match) {
+                    /*node.value = node.value.replace(bindRegEx, function (match) {
                      return replaceFn(match, 1, node);
                      });*/
                 }
@@ -2706,10 +2873,10 @@
                     while (l--) {
 
                         attr = attrs.item(l);
-                        results = attr.nodeValue && attr.nodeValue.match(/\{\{(.*?)\}\}/gi);
+                        results = attr.value && attr.value.match(/\{\{(.*?)\}\}/gi);
 
                         if (results) {
-                            var original = attr.nodeValue,
+                            var original = attr.value,
                                 fillAttr = fillAttrs[attr.nodeName];
 
                             i = 0;
@@ -2729,7 +2896,7 @@
                                         ret = me.getModel(header[0]).data(header[1]) || "";
                                     }
 
-                                    attr.nodeValue = attr.nodeValue.replace(result, ret);
+                                    attr.value = attr.value.replace(result, ret);
 
                                 } else {
 
@@ -2757,11 +2924,11 @@
 
                                 if (attr.nodeName === 'css') {
 
-                                    value = attr.nodeValue;
+                                    value = attr.value;
 
                                     attr = document.createAttribute("style");
 
-                                    attr.nodeValue = value;
+                                    attr.value = value;
 
                                     node.removeAttribute('css');
 
@@ -2784,11 +2951,11 @@
 
                             if (attr.nodeName === 'css') {
 
-                                value = attr.nodeValue;
+                                value = attr.value;
 
                                 attr = document.createAttribute("style");
 
-                                attr.nodeValue = value;
+                                attr.value = value;
 
                                 node.removeAttribute('css');
 
@@ -2798,7 +2965,7 @@
 
                         }
 
-                        /*attrs.item(l).nodeValue = attrs[l].nodeValue.replace(bindRegEx, function (match) {
+                        /*attrs.item(l).value = attrs[l].value.replace(bindRegEx, function (match) {
                          return replaceFn(match, 0, attrs[l]);
                          });*/
                     }
@@ -2848,22 +3015,64 @@
             return el;
         },
         /**
-         * @version 0.1.8
+         * @version 0.1.12
+         */
+        resolveModelBindings: function (model) {
+            var me = this,
+                bindings = me._bindings,
+                bindFnFactory,
+                headers,
+                header,
+                binding,
+                eventName,
+                lenM = 0,
+                len = 0;
+
+            bindFnFactory = function (binding) {
+                return function () {
+                    me.partialRender(binding);
+                };
+            };
+
+            len = bindings.length;
+            while (len--) {
+
+                binding = bindings[len];
+                headers = binding.headers;
+                lenM = headers.length;
+                while (lenM--) {
+
+                    if (model.getNamespace() === headers[lenM][0]) {
+
+                        header = headers[lenM][1];
+                        eventName = 'data' + header.charAt(0).toUpperCase() + header.slice(1) + 'Change';
+                        binding.fn = bindFnFactory(binding);
+
+                        model.addEventListener(eventName,  binding.fn);
+
+                        binding.fn();
+
+                    }
+
+                }
+            }
+        },
+        /**
+         * @version 0.1.12
          */
         resolveBindings: function () {
             var me = this,
                 bindings = me._bindings,
-                models = me._config.models,
-                bindFactory,
+                bindFnFactory,
                 model,
                 headers,
                 header,
                 binding,
-                property,
+                eventName,
                 lenM = 0,
                 len = 0;
 
-            bindFactory = function (binding) {
+            bindFnFactory = function (binding) {
                 return function () {
                     me.partialRender(binding);
                 };
@@ -2875,7 +3084,7 @@
                 binding = bindings[len];
                 headers = binding.headers;
 
-                if (binding.type === 3) {
+                if (binding.type === 3 && binding.oldDOM) {
                     binding.oldDOM.parentNode.replaceChild(binding.pointer, binding.oldDOM);
                     delete binding.oldDOM;
                 }
@@ -2883,12 +3092,16 @@
                 lenM = headers.length;
                 while (lenM--) {
 
-                    model = models[headers[lenM][0]];
+                    model = me.getModel(headers[lenM][0]);
                     header = headers[lenM][1];
 
                     if (model) {
-                        property = header.charAt(0).toUpperCase() + header.slice(1);
-                        model.addListener('data' + property + 'Change', bindFactory(binding));
+
+                        binding.fn = bindFnFactory(binding);
+                        eventName = 'data' + header.charAt(0).toUpperCase() + header.slice(1) + 'Change';
+
+                        model.addEventListener( eventName, binding.fn);
+
                     }
 
                 }
@@ -2939,6 +3152,50 @@
                 }
 
             }
+
+            return me;
+        },
+        /**
+         * @version 0.1.12
+         */
+        removeBindings : function () {
+            var me = this,
+                bindings = me._bindings,
+                l = bindings.length,
+                binding,
+                model,
+                header,
+                l2,
+                eventName;
+
+            while(l--) {
+
+                binding = bindings[l];
+                l2 = binding.headers.length;
+                while(l2--) {
+
+                    header = binding.headers[l2];
+                    model = me.getModel(header[0]);
+                    eventName ='data' + header[1].charAt(0).toUpperCase() + header[1].slice(1) + 'Change';
+
+                    model.removeEventListener(eventName, binding.fn);
+
+                }
+
+            }
+
+            return me;
+        },
+        /**
+         * @version 0.1.12
+         */
+        removeRendered: function () {
+            var me = this;
+
+            me._el.parentNode.removeChild(me._el);
+            me.removeBindings();
+            me.set('el', null);
+            me.set('isInDOM', false);
 
             return me;
         },
@@ -3119,17 +3376,15 @@
          * @returns {View}
          */
         show: function () {
-            var me = this,
-                style;
+            var me = this;
 
             if (!me.isInDOM())
                 return me;
 
-            style = me.get('el').style;
-            style.display = 'block';
+            me.get('el').classList.remove('yamvc-hidden');
 
             me.set('visible', true);
-            me.fireEvent('show', me, style);
+            me.fireEvent('show', me);
 
             return me;
         },
@@ -3137,17 +3392,16 @@
          * @returns {View}
          */
         hide: function () {
-            var me = this,
-                style;
+            var me = this;
 
             if (!me.isInDOM())
                 return me;
 
-            style = me.get('el').style;
-            style.display = 'none';
+
+            me.get('el').classList.add('yamvc-hidden');
 
             me.set('visible', false);
-            me.fireEvent('hide', me, style);
+            me.fireEvent('hide', me);
 
             return me;
         },
